@@ -23,9 +23,16 @@ async function findDead(error, progress) {
 
         running++;
         const bookmark = queue.shift();
+
+        // https://developers.google.com/web/updates/2017/09/abortable-fetch
+        const controller = new AbortController();
+        const signal = controller.signal;
+        setTimeout(() => controller.abort(), 15000);
+
         // Can't use HEAD request, because a ton of websites return a 405 error.
         // For example amazon.com or medium.com.
-        fetch(bookmark.url).then(response => {
+        fetch(bookmark.url, { signal }).then(response => {
+
             running--;
 
             if (response.status == 404) {
