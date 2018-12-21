@@ -8,13 +8,37 @@ browser.browserAction.onClicked.addListener(() => {
 
 const IGNORED_SCHEME = /^(place|about|javascript|data)\:/i;
 const NOT_FOUND_404 = /\b404\b|(page not found)|(file not found)|(site not found)/i;
+var FETCH_TIMEOUT = 20000;
+var MAX_FETCH_REQUESTS = 30;
+var RECHECK_TIME = 500;
+
+async function getSettings() {
+
+  let settings = await Promise.all([
+    browser.storage.sync.get('max_fetch_requests'),
+    browser.storage.sync.get('recheck_time'),
+    browser.storage.sync.get('fetch_timeout')
+  ]);
+
+  if(!isNaN(settings[0].max_fetch_requests)){
+      MAX_FETCH_REQUESTS = settings[0].max_fetch_requests;
+  }
+   if(!isNaN(settings[1].recheck_time)){
+     RECHECK_TIME = settings[1].recheck_time;
+   }
+   if(!isNaN(settings[2].fetch_timeout)){
+     FETCH_TIMEOUT= settings[2].fetch_timeout;
+   }
+
+  return;
+}
 
 async function findDead(error, progress) {
     let found = 0;
     let running = 0;
     function work(queue, error, progress) {
-        if (running > 30) {
-            setTimeout(work, 500, queue, error, progress);
+        if (running > MAX_FETCH_REQUESTS) {
+            setTimeout(work, RECHECK_TIME, queue, error, progress);
             return;
         }
         if (queue.length == 0) {
@@ -27,7 +51,7 @@ async function findDead(error, progress) {
         // https://developers.google.com/web/updates/2017/09/abortable-fetch
         const controller = new AbortController();
         const signal = controller.signal;
-        setTimeout(() => controller.abort(), 15000);
+        setTimeout(() => controller.abort(), FETCH_TIMEOUT);
 
         // Can't use HEAD request, because a ton of websites return a 405 error.
         // For example amazon.com or medium.com.
@@ -80,7 +104,12 @@ async function findDead(error, progress) {
     });
 }
 
-function onMessage(message, sender, sendResponse) {
+async function onMessage(message, sender, sendResponse) {
+    await getSettings();
+    console.log("FETCH_TIMEOUT: " + FETCH_TIMEOUT);
+    console.log("MAX_FETCH_REQUESTS: " + MAX_FETCH_REQUESTS);
+    console.log("RECHECK_TIME: " + RECHECK_TIME);
+
     if (message.type == "find_dead") {
         findDead((bookmark, error) => {
             browser.tabs.sendMessage(sender.tab.id, {type: "dead", bookmark, error});

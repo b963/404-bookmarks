@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+  </head>
+
+  <body>
+
+    <form>
+      <table>
+        <tr>
+            <td><label>Amount of simultaneous fetch requests : </label></td>
+            <td><input type="text" id="max_fetch_requests" ></td>
+            <td>default value: 30</td>
+        </tr>
+        <tr>
+          <td><label>Recheck simultaneous fetch requests (ms) : </label></td>
+          <td><input type="text" id="recheck_time" ></td>
+          <td>default value: 500 ms</td>
+        </tr>
+        <tr>
+          <td><label>Fetch timeout (ms) : </label></td>
+          <td><input type="text" id="fetch_timeout" ></td>
+          <td>default value: 20000 ms</td>
+        </tr>
+        <tr>
+           <td></td>
+           <td></td>
+           <td><button type="submit">Save</button></td>
+        </tr>
+  </table>
+
+    </form>
+
+    <script src="options.js"></script>
+
+  </body>
+
+</html>

@@ -3,14 +3,16 @@
   "description": "Show and remove expired bookmarks",
   "manifest_version": 2,
   "name": "404 Bookmarks",
-  "version": "1.7",
+  "version": "1.8 beta",
 
   "icons": {
     "48": "icon.svg"
   },
 
   "permissions": [
-    "bookmarks", "<all_urls>"
+    "bookmarks",
+    "<all_urls>",
+    "storage"
   ],
 
   "background": {
@@ -20,5 +22,18 @@
   "browser_action": {
     "default_title": "404 Bookmarks",
     "default_icon": "icon.svg"
+  },
+
+  "options_ui": {
+        "page": "options.html",
+        "browser_style": true
+    },
+
+  "applications": {
+      "gecko": {
+          "id": "404-bookmarks@testing"
+      }
   }
+
+
 }
